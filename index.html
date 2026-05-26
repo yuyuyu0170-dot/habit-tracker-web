@@ -47,18 +47,18 @@ body {
   padding: 24px 16px 56px;
 }
 
-.wrap { max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.wrap { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.top-bar { display: flex; justify-content: space-between; align-items: center; padding: 4px 0 10px; border-bottom: 1px solid var(--border); }
+.main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+.side-panel { display: flex; flex-direction: column; gap: 14px; }
 
 /* ─── Header ─── */
-.header { padding: 4px 0 10px; border-bottom: 1px solid var(--border); }
 .header h1 { font-size: 1.1rem; font-weight: 700; color: var(--t1); }
 .header p  { font-size: 0.75rem; color: var(--t2); margin-top: 3px; }
 
 /* ─── Month nav ─── */
 .month-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--s1); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 10px 14px;
+  display: flex; align-items: center; gap: 12px;
 }
 .nav-btn {
   width: 30px; height: 30px; border-radius: 6px;
@@ -213,15 +213,16 @@ body {
 <body>
 <div class="wrap">
 
-  <div class="header">
-    <h1>習慣トラッカー</h1>
-    <p>毎日の記録を積み上げよう</p>
-  </div>
-
-  <div class="month-nav">
-    <button class="nav-btn" id="prev">‹</button>
-    <span class="month-label" id="month-lbl"></span>
-    <button class="nav-btn" id="next">›</button>
+  <div class="top-bar">
+    <div class="header">
+      <h1>習慣トラッカー</h1>
+      <p>毎日の記録を積み上げよう</p>
+    </div>
+    <div class="month-nav">
+      <button class="nav-btn" id="prev">‹</button>
+      <span class="month-label" id="month-lbl"></span>
+      <button class="nav-btn" id="next">›</button>
+    </div>
   </div>
 
   <div class="stats">
@@ -239,24 +240,28 @@ body {
     </div>
   </div>
 
-  <div class="today">
-    <div class="today-head">
-      <span class="today-date" id="today-lbl"></span>
-      <span class="today-pct" id="today-pct"></span>
+  <div class="main-grid">
+    <div class="today">
+      <div class="today-head">
+        <span class="today-date" id="today-lbl"></span>
+        <span class="today-pct" id="today-pct"></span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog" style="width:0"></div></div>
+      <div class="habits" id="habits"></div>
+      <div class="ebar" id="ebar"></div>
     </div>
-    <div class="prog-track"><div class="prog-fill" id="prog" style="width:0"></div></div>
-    <div class="habits" id="habits"></div>
-    <div class="ebar" id="ebar"></div>
-  </div>
 
-  <div class="heatmap-card">
-    <div class="card-title">直近 15 週</div>
-    <div class="hmap" id="hmap"></div>
-  </div>
+    <div class="side-panel">
+      <div class="heatmap-card">
+        <div class="card-title">直近 15 週</div>
+        <div class="hmap" id="hmap"></div>
+      </div>
 
-  <div class="cal-card">
-    <div class="card-title" id="cal-title">月間カレンダー</div>
-    <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-card">
+        <div class="card-title" id="cal-title">月間カレンダー</div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+    </div>
   </div>
 
   <div class="settings-card">
