@@ -37,15 +37,10 @@ html, body {
   color: var(--t1);
 }
 
-body { margin: 0; }
-
-#app {
-  width: 100%;
-  height: 100%;
+body {
   display: flex;
   flex-direction: column;
   transform-origin: top left;
-  background: var(--blue-500);
 }
 
 /* ══════════════════════════════
@@ -110,10 +105,10 @@ body { margin: 0; }
   display: flex; align-items: center; gap: 4px; flex-shrink: 0;
 }
 .zoom-btn {
-  width: 22px; height: 22px; border-radius: 5px; flex-shrink: 0;
+  width: 22px; height: 22px; border-radius: 5px;
   background: rgba(255,255,255,0.15);
   border: 1px solid rgba(255,255,255,0.25);
-  color: #fff; font-size: 0.85rem; line-height: 1; cursor: pointer;
+  color: #fff; font-size: 0.9rem; line-height: 1; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s;
 }
@@ -316,7 +311,6 @@ body { margin: 0; }
 </style>
 </head>
 <body>
-<div id="app">
 
 <!-- Top bar -->
 <div class="top-bar">
@@ -351,6 +345,7 @@ body { margin: 0; }
     <span class="zoom-lbl" id="zoom-lbl">100%</span>
     <button class="zoom-btn" id="zoom-in">＋</button>
   </div>
+
   <button class="toggle-side" id="toggle-side" title="履歴パネルを開閉">▶</button>
 </div>
 
@@ -381,7 +376,7 @@ body { margin: 0; }
     </div>
   </div>
 
-  <!-- Side panel -->
+  <!-- Side -->
   <div class="side-panel" id="side-panel">
     <div class="card">
       <div class="card-title">直近 15 週</div>
@@ -397,7 +392,6 @@ body { margin: 0; }
     </div>
   </div>
 </div>
-</div><!-- #app -->
 
 <script>
 const KEY = 'habit-v2';
@@ -531,10 +525,9 @@ const ZOOM_KEY='habit-zoom';
 const ZOOM_STEP=0.05, ZOOM_MIN=0.5, ZOOM_MAX=1.5;
 let zoom=parseFloat(localStorage.getItem(ZOOM_KEY))||1.0;
 function applyZoom(){
-  const app=document.getElementById('app');
-  app.style.transform=`scale(${zoom})`;
-  app.style.width=`${100/zoom}%`;
-  app.style.height=`${100/zoom}%`;
+  document.body.style.transform=`scale(${zoom})`;
+  document.body.style.width=`${100/zoom}%`;
+  document.body.style.height=`${100/zoom}%`;
   document.getElementById('zoom-lbl').textContent=Math.round(zoom*100)+'%';
   localStorage.setItem(ZOOM_KEY,zoom);
 }
