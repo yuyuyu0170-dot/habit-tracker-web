@@ -460,7 +460,12 @@ const ZOOM_KEY='habit-zoom';
 const ZOOM_STEP=5, ZOOM_MIN=50, ZOOM_MAX=150;
 let zoomPct=parseInt(localStorage.getItem(ZOOM_KEY))||100;
 function applyZoom(){
-  document.documentElement.style.zoom=zoomPct/100;
+  const z=zoomPct/100;
+  document.documentElement.style.zoom=z;
+  // vw/vh はズームの影響を受けず常に実際のビューポートを参照するため、
+  // body を (100/z)vw × (100/z)vh にすると z 倍されてちょうど viewport を埋める（余白なし）。
+  document.body.style.width=`${100/z}vw`;
+  document.body.style.height=`${100/z}vh`;
   document.getElementById('zoom-lbl').textContent=zoomPct+'%';
   localStorage.setItem(ZOOM_KEY,zoomPct);
 }
