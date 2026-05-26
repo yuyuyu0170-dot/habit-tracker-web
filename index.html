@@ -33,7 +33,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: Arial, 'Helvetica Neue', sans-serif;
-  background: var(--blue-500);
+  background: var(--blue-050);
   color: var(--t1);
 }
 
@@ -44,11 +44,11 @@ body {
 }
 
 /* ══════════════════════════════
-   TOP BAR — blue background
+   TOP BAR
 ══════════════════════════════ */
 .top-bar {
   flex-shrink: 0;
-  background: var(--blue-900);
+  background: var(--blue-500);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -59,40 +59,21 @@ body {
 .header h1 { font-size: 0.95rem; font-weight: 700; color: #fff; }
 .header p  { font-size: 0.65rem; color: rgba(255,255,255,0.65); margin-top: 1px; }
 
-/* Stats chips in top bar */
-.stat-chips {
-  display: flex;
-  gap: 8px;
-  flex: 1;
-}
+.stat-chips { display: flex; gap: 8px; flex: 1; }
 .chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #fff;
-  border-radius: 20px;
-  padding: 4px 12px;
+  display: flex; align-items: center; gap: 6px;
+  background: #fff; border-radius: 20px; padding: 4px 12px;
 }
-.chip-num {
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1;
-}
+.chip-num { font-size: 1rem; font-weight: 700; line-height: 1; }
 .chip-num.orange { color: var(--orange); }
 .chip-num.blue   { color: var(--blue-500); }
 .chip-num.green  { color: var(--green-500); }
-.chip-lbl {
-  font-size: 0.62rem;
-  color: var(--t2);
-  white-space: nowrap;
-}
+.chip-lbl { font-size: 0.62rem; color: var(--t2); white-space: nowrap; }
 
-/* Month nav */
 .month-nav { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .nav-btn {
   width: 26px; height: 26px; border-radius: 6px;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
   color: #fff; font-size: 0.9rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s;
@@ -100,14 +81,11 @@ body {
 .nav-btn:hover { background: rgba(255,255,255,0.3); }
 .month-label { font-size: 0.82rem; font-weight: 700; color: #fff; white-space: nowrap; }
 
-/* Zoom control */
-.zoom-ctrl {
-  display: flex; align-items: center; gap: 4px; flex-shrink: 0;
-}
+/* Zoom */
+.zoom-ctrl { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 .zoom-btn {
   width: 22px; height: 22px; border-radius: 5px;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
   color: #fff; font-size: 0.9rem; line-height: 1; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s;
@@ -118,11 +96,9 @@ body {
   width: 32px; text-align: center; font-weight: 700;
 }
 
-/* Toggle button */
 .toggle-side {
   width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
   color: rgba(255,255,255,0.8); font-size: 0.75rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s;
@@ -132,43 +108,26 @@ body {
 /* ══════════════════════════════
    BODY AREA
 ══════════════════════════════ */
-.body-area {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-  gap: 0;
-}
+.body-area { flex: 1; display: flex; overflow: hidden; }
 
-/* ── Main panel ── */
 .main-panel {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
+  flex: 1; min-width: 0; overflow: hidden;
   padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: flex; flex-direction: column; gap: 10px;
 }
 
-/* Today card */
 .today {
-  background: var(--bg);
-  border: 1.5px solid var(--blue-100);
-  border-radius: var(--r);
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
+  background: var(--bg); border: 1.5px solid var(--blue-100);
+  border-radius: var(--r); padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  flex: 1; min-height: 0; overflow: hidden;
 }
 .today-head { display: flex; justify-content: space-between; align-items: center; }
 .today-date { font-size: 0.9rem; font-weight: 700; color: var(--blue-900); }
 .today-pct  { font-size: 0.75rem; color: var(--t2); }
 
 .prog-track { height: 5px; background: var(--blue-050); border-radius: 99px; overflow: hidden; }
-.prog-fill  {
+.prog-fill {
   height: 100%; border-radius: 99px;
   background: linear-gradient(90deg, var(--blue-300), var(--blue-500));
   transition: width 0.4s cubic-bezier(.4,0,.2,1);
@@ -206,7 +165,6 @@ body {
   border-radius: 20px; padding: 2px 10px;
 }
 
-/* Settings */
 .settings-card {
   background: var(--bg); border: 1px solid var(--border);
   border-radius: var(--r); padding: 10px 14px; flex-shrink: 0;
@@ -238,34 +196,22 @@ body {
 }
 .sbtn:hover { background: var(--blue-900); }
 
-/* ── Side panel ── */
 .side-panel {
-  width: var(--side-w);
-  flex-shrink: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: var(--bg);
-  border-left: 2px solid var(--blue-100);
+  width: var(--side-w); flex-shrink: 0;
+  overflow-y: auto; overflow-x: hidden;
+  background: var(--bg); border-left: 2px solid var(--blue-100);
   padding: 14px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: flex; flex-direction: column; gap: 12px;
   transition: width 0.25s ease, padding 0.25s ease, border 0.25s ease;
 }
-.side-panel.closed {
-  width: 0; padding: 0; border-left: none; overflow: hidden;
-}
+.side-panel.closed { width: 0; padding: 0; border-left: none; overflow: hidden; }
 
-.card {
-  background: var(--s1); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 12px;
-}
+.card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 12px; }
 .card-title {
   font-size: 0.63rem; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.08em; color: var(--blue-500); margin-bottom: 10px;
 }
 
-/* Heatmap */
 .hmap { display: grid; grid-template-columns: repeat(15, 1fr); gap: 3px; }
 .cell { aspect-ratio: 1; border-radius: 3px; cursor: default; transition: transform 0.1s; }
 .cell:hover { transform: scale(1.4); z-index: 1; position: relative; }
@@ -276,7 +222,6 @@ body {
 .h4 { background: var(--blue-500); }
 .h5 { background: var(--blue-900); }
 
-/* Calendar */
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
 .cal-wd { font-size: 0.58rem; color: var(--t3); text-align: center; padding-bottom: 3px; font-weight: 700; }
 .cal-d {
@@ -293,14 +238,13 @@ body {
 .d4 { background: var(--blue-500); color: #fff; }
 .d5 { background: var(--blue-900); color: #fff; }
 
-/* Date list */
 .date-list { display: flex; flex-direction: column; gap: 2px; }
 .date-row {
   display: flex; align-items: center; gap: 6px;
   padding: 4px 6px; border-radius: 5px; font-size: 0.68rem;
 }
 .date-row:hover { background: var(--blue-050); }
-.date-row.is-today { background: var(--blue-050); border: 1px solid var(--blue-100); border-radius: 5px; }
+.date-row.is-today { background: var(--blue-050); border: 1px solid var(--blue-100); }
 .dr-date { color: var(--t2); width: 64px; flex-shrink: 0; font-size: 0.65rem; }
 .dr-dots { flex: 1; letter-spacing: 0.5px; font-size: 0.72rem; }
 .dr-pct { width: 32px; text-align: right; font-weight: 700; font-size: 0.65rem; flex-shrink: 0; }
@@ -312,7 +256,6 @@ body {
 </head>
 <body>
 
-<!-- Top bar -->
 <div class="top-bar">
   <div class="header">
     <h1>習慣トラッカー</h1>
@@ -332,6 +275,12 @@ body {
       <span class="chip-num green" id="s-rate">—</span>
       <span class="chip-lbl">今月達成率</span>
     </div>
+
+    <div class="zoom-ctrl">
+      <button class="zoom-btn" id="zoom-out">−</button>
+      <span class="zoom-lbl" id="zoom-lbl">100%</span>
+      <button class="zoom-btn" id="zoom-in">＋</button>
+    </div>
   </div>
 
   <div class="month-nav">
@@ -340,19 +289,10 @@ body {
     <button class="nav-btn" id="next">›</button>
   </div>
 
-  <div class="zoom-ctrl">
-    <button class="zoom-btn" id="zoom-out">−</button>
-    <span class="zoom-lbl" id="zoom-lbl">100%</span>
-    <button class="zoom-btn" id="zoom-in">＋</button>
-  </div>
-
   <button class="toggle-side" id="toggle-side" title="履歴パネルを開閉">▶</button>
 </div>
 
-<!-- Body -->
 <div class="body-area">
-
-  <!-- Main -->
   <div class="main-panel">
     <div class="today">
       <div class="today-head">
@@ -376,7 +316,6 @@ body {
     </div>
   </div>
 
-  <!-- Side -->
   <div class="side-panel" id="side-panel">
     <div class="card">
       <div class="card-title">直近 15 週</div>
@@ -520,7 +459,7 @@ function renderSettings() {
   });
 }
 
-// Zoom control
+// Zoom
 const ZOOM_KEY='habit-zoom';
 const ZOOM_STEP=5, ZOOM_MIN=50, ZOOM_MAX=150;
 let zoomPct=parseInt(localStorage.getItem(ZOOM_KEY))||100;
@@ -536,7 +475,7 @@ document.getElementById('zoom-in').onclick=()=>{ zoomPct=Math.min(ZOOM_MAX,zoomP
 document.getElementById('zoom-out').onclick=()=>{ zoomPct=Math.max(ZOOM_MIN,zoomPct-ZOOM_STEP); applyZoom(); };
 applyZoom();
 
-// Side panel toggle
+// Side panel
 const sidePanel=document.getElementById('side-panel');
 const toggleBtn=document.getElementById('toggle-side');
 let sideOpen=true;
