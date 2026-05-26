@@ -37,11 +37,7 @@ html, body {
   color: var(--t1);
 }
 
-body {
-  display: flex;
-  flex-direction: column;
-  transform-origin: top left;
-}
+body { display: flex; flex-direction: column; }
 
 /* ══════════════════════════════
    TOP BAR
@@ -464,10 +460,7 @@ const ZOOM_KEY='habit-zoom';
 const ZOOM_STEP=5, ZOOM_MIN=50, ZOOM_MAX=150;
 let zoomPct=parseInt(localStorage.getItem(ZOOM_KEY))||100;
 function applyZoom(){
-  const z=zoomPct/100;
-  document.body.style.transform=`scale(${z})`;
-  document.body.style.width=`${100/z}%`;
-  document.body.style.height=`${100/z}%`;
+  document.documentElement.style.zoom=zoomPct/100;
   document.getElementById('zoom-lbl').textContent=zoomPct+'%';
   localStorage.setItem(ZOOM_KEY,zoomPct);
 }
