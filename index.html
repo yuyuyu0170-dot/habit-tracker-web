@@ -37,7 +37,16 @@ html, body {
   color: var(--t1);
 }
 
-body { display: flex; flex-direction: column; }
+body { margin: 0; }
+
+#app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transform-origin: top left;
+  background: var(--blue-500);
+}
 
 /* ══════════════════════════════
    TOP BAR — blue background
@@ -95,6 +104,24 @@ body { display: flex; flex-direction: column; }
 }
 .nav-btn:hover { background: rgba(255,255,255,0.3); }
 .month-label { font-size: 0.82rem; font-weight: 700; color: #fff; white-space: nowrap; }
+
+/* Zoom control */
+.zoom-ctrl {
+  display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+}
+.zoom-btn {
+  width: 22px; height: 22px; border-radius: 5px; flex-shrink: 0;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff; font-size: 0.85rem; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.zoom-btn:hover { background: rgba(255,255,255,0.3); }
+.zoom-lbl {
+  font-size: 0.62rem; color: rgba(255,255,255,0.75);
+  width: 30px; text-align: center; font-weight: 700;
+}
 
 /* Toggle button */
 .toggle-side {
@@ -289,6 +316,7 @@ body { display: flex; flex-direction: column; }
 </style>
 </head>
 <body>
+<div id="app">
 
 <!-- Top bar -->
 <div class="top-bar">
@@ -318,6 +346,11 @@ body { display: flex; flex-direction: column; }
     <button class="nav-btn" id="next">›</button>
   </div>
 
+  <div class="zoom-ctrl">
+    <button class="zoom-btn" id="zoom-out">−</button>
+    <span class="zoom-lbl" id="zoom-lbl">100%</span>
+    <button class="zoom-btn" id="zoom-in">＋</button>
+  </div>
   <button class="toggle-side" id="toggle-side" title="履歴パネルを開閉">▶</button>
 </div>
 
@@ -348,7 +381,7 @@ body { display: flex; flex-direction: column; }
     </div>
   </div>
 
-  <!-- Side -->
+  <!-- Side panel -->
   <div class="side-panel" id="side-panel">
     <div class="card">
       <div class="card-title">直近 15 週</div>
@@ -364,6 +397,7 @@ body { display: flex; flex-direction: column; }
     </div>
   </div>
 </div>
+</div><!-- #app -->
 
 <script>
 const KEY = 'habit-v2';
@@ -491,6 +525,22 @@ function renderSettings() {
     box.appendChild(row);
   });
 }
+
+// Zoom control
+const ZOOM_KEY='habit-zoom';
+const ZOOM_STEP=0.05, ZOOM_MIN=0.5, ZOOM_MAX=1.5;
+let zoom=parseFloat(localStorage.getItem(ZOOM_KEY))||1.0;
+function applyZoom(){
+  const app=document.getElementById('app');
+  app.style.transform=`scale(${zoom})`;
+  app.style.width=`${100/zoom}%`;
+  app.style.height=`${100/zoom}%`;
+  document.getElementById('zoom-lbl').textContent=Math.round(zoom*100)+'%';
+  localStorage.setItem(ZOOM_KEY,zoom);
+}
+document.getElementById('zoom-in').onclick=()=>{ zoom=Math.min(ZOOM_MAX,Math.round((zoom+ZOOM_STEP)*100)/100); applyZoom(); };
+document.getElementById('zoom-out').onclick=()=>{ zoom=Math.max(ZOOM_MIN,Math.round((zoom-ZOOM_STEP)*100)/100); applyZoom(); };
+applyZoom();
 
 // Side panel toggle
 const sidePanel=document.getElementById('side-panel');
