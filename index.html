@@ -8,239 +8,322 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* デジタル庁 Blue パレット */
   --blue-900: #0017C1;
   --blue-500: #3460FB;
   --blue-300: #7096F8;
   --blue-100: #C5D7FB;
   --blue-050: #E8F1FE;
-
-  /* Green（達成・成功） */
   --green-700: #1A8A5C;
   --green-500: #2AB27B;
   --green-100: #C5E8D8;
   --green-050: #EEF8F4;
-
-  /* Orange（ストリーク） */
-  --orange:    #E87A00;
-  --orange-bg: #FEF3E0;
-
-  /* Surface */
+  --orange: #E87A00;
   --bg:     #FFFFFF;
   --s1:     #F8F8FB;
   --s2:     #EEF0F8;
   --border: #D8DCF0;
-
-  /* Text */
   --t1: #000000;
   --t2: #5F6B7A;
   --t3: #9AA3B0;
-
-  --r: 12px;
+  --r: 10px;
+  --side-w: 280px;
 }
 
-body {
+html, body {
+  height: 100%;
+  overflow: hidden;
   font-family: Arial, 'Helvetica Neue', sans-serif;
-  background: var(--bg);
+  background: var(--blue-050);
   color: var(--t1);
-  min-height: 100vh;
-  padding: 24px 16px 56px;
 }
 
-.wrap { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
-.top-bar { display: flex; justify-content: space-between; align-items: center; padding: 4px 0 10px; border-bottom: 1px solid var(--border); }
-.main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
-.side-panel { display: flex; flex-direction: column; gap: 14px; }
+body { display: flex; flex-direction: column; }
 
-/* ─── Header ─── */
-.header h1 { font-size: 1.1rem; font-weight: 700; color: var(--t1); }
-.header p  { font-size: 0.75rem; color: var(--t2); margin-top: 3px; }
-
-/* ─── Month nav ─── */
-.month-nav {
-  display: flex; align-items: center; gap: 12px;
+/* ══════════════════════════════
+   TOP BAR — blue background
+══════════════════════════════ */
+.top-bar {
+  flex-shrink: 0;
+  background: var(--blue-500);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 18px;
 }
+
+.header { flex-shrink: 0; }
+.header h1 { font-size: 0.95rem; font-weight: 700; color: #fff; }
+.header p  { font-size: 0.65rem; color: rgba(255,255,255,0.65); margin-top: 1px; }
+
+/* Stats chips in top bar */
+.stat-chips {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+.chip-num {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.chip-num.orange { color: var(--orange); }
+.chip-num.blue   { color: var(--blue-500); }
+.chip-num.green  { color: var(--green-500); }
+.chip-lbl {
+  font-size: 0.62rem;
+  color: var(--t2);
+  white-space: nowrap;
+}
+
+/* Month nav */
+.month-nav { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .nav-btn {
-  width: 30px; height: 30px; border-radius: 6px;
-  background: var(--bg); border: 1px solid var(--border);
-  color: var(--t1); font-size: 1rem; cursor: pointer;
+  width: 26px; height: 26px; border-radius: 6px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff; font-size: 0.9rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s;
 }
-.nav-btn:hover { background: var(--s2); }
-.month-label { font-size: 0.95rem; font-weight: 700; }
+.nav-btn:hover { background: rgba(255,255,255,0.3); }
+.month-label { font-size: 0.82rem; font-weight: 700; color: #fff; white-space: nowrap; }
 
-/* ─── Stat row ─── */
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.stat {
-  background: var(--s1); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 14px 10px; text-align: center;
+/* Toggle button */
+.toggle-side {
+  width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.8); font-size: 0.75rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
 }
-.stat-num {
-  font-size: 2rem; font-weight: 700; line-height: 1;
-  display: block; margin-bottom: 6px;
-}
-.stat-num.orange { color: var(--orange); }
-.stat-num.blue   { color: var(--blue-500); }
-.stat-num.green  { color: var(--green-500); }
-.stat-lbl { font-size: 0.68rem; color: var(--t2); font-weight: 400; }
+.toggle-side:hover { background: rgba(255,255,255,0.3); color: #fff; }
 
-/* ─── Today card ─── */
+/* ══════════════════════════════
+   BODY AREA
+══════════════════════════════ */
+.body-area {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* ── Main panel ── */
+.main-panel {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Today card */
 .today {
-  background: var(--s1); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 18px;
-  display: flex; flex-direction: column; gap: 13px;
+  background: var(--bg);
+  border: 1.5px solid var(--blue-100);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
 }
-.today-head { display: flex; justify-content: space-between; align-items: baseline; }
-.today-date { font-size: 0.95rem; font-weight: 700; }
-.today-pct  { font-size: 0.8rem; color: var(--t2); }
+.today-head { display: flex; justify-content: space-between; align-items: center; }
+.today-date { font-size: 0.9rem; font-weight: 700; color: var(--blue-900); }
+.today-pct  { font-size: 0.75rem; color: var(--t2); }
 
-/* Progress bar */
-.prog-track { height: 4px; background: var(--s2); border-radius: 99px; overflow: hidden; }
+.prog-track { height: 5px; background: var(--blue-050); border-radius: 99px; overflow: hidden; }
 .prog-fill  {
-  height: 100%; border-radius: 99px; background: var(--blue-500);
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--blue-300), var(--blue-500));
   transition: width 0.4s cubic-bezier(.4,0,.2,1);
 }
-.prog-fill.full { background: var(--green-500); }
+.prog-fill.full { background: linear-gradient(90deg, var(--green-500), var(--green-700)); }
 
-/* Habit list */
-.habits { display: flex; flex-direction: column; gap: 8px; }
+.habits { display: flex; flex-direction: column; gap: 6px; }
 .habit {
-  display: flex; align-items: center; gap: 12px; padding: 10px 12px;
-  border-radius: 8px; background: var(--bg); border: 1px solid var(--border);
-  cursor: pointer; transition: border-color 0.15s, background 0.15s; user-select: none;
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 7px;
+  background: var(--s1); border: 1px solid var(--border);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  user-select: none;
 }
-.habit:hover { background: var(--s2); }
+.habit:hover { background: var(--blue-050); border-color: var(--blue-100); }
 .habit.done  { background: var(--green-050); border-color: var(--green-100); }
-
 .chk {
-  width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0;
-  border: 1.5px solid var(--border); display: flex;
-  align-items: center; justify-content: center;
-  font-size: 0.75rem; color: #fff; transition: all 0.15s;
+  width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; color: #fff; transition: all 0.15s;
 }
+.habit:not(.done) .chk { border-color: var(--blue-200, #9BBCFD); }
 .habit.done .chk { background: var(--green-500); border-color: var(--green-500); }
-
-.hname { font-size: 0.9rem; font-weight: 400; }
+.hname { font-size: 0.84rem; }
 .habit.done .hname { color: var(--green-700); font-weight: 500; }
 
-/* Emoji bar */
 .ebar {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  font-size: 1rem; letter-spacing: 1px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 0.9rem; letter-spacing: 1px;
 }
 .eval {
-  font-size: 0.72rem; font-weight: 600; color: var(--blue-500);
-  background: var(--blue-050); border-radius: 4px; padding: 3px 10px;
+  font-size: 0.67rem; font-weight: 700; color: var(--blue-500);
+  background: var(--blue-050); border: 1px solid var(--blue-100);
+  border-radius: 20px; padding: 2px 10px;
 }
 
-/* ─── Cards ─── */
-.heatmap-card, .cal-card, .settings-card {
-  background: var(--s1); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 18px;
+/* Settings */
+.settings-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 10px 14px; flex-shrink: 0;
 }
-.card-title {
-  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.08em; color: var(--t2); margin-bottom: 13px;
-}
-
-/* ─── Heatmap ─── */
-.hmap { display: grid; grid-template-columns: repeat(15, 1fr); gap: 3px; }
-.cell {
-  aspect-ratio: 1; border-radius: 3px;
-  transition: transform 0.12s; cursor: default;
-}
-.cell:hover { transform: scale(1.4); z-index: 1; position: relative; }
-.h0 { background: var(--s2); }
-.h1 { background: var(--green-050); }
-.h2 { background: var(--green-100); }
-.h3 { background: #7BCFAB; }
-.h4 { background: var(--green-500); }
-.h5 { background: var(--green-700); }
-
-/* ─── Calendar ─── */
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-.cal-wd {
-  font-size: 0.63rem; color: var(--t3); text-align: center;
-  padding-bottom: 5px; font-weight: 700;
-}
-.cal-d {
-  aspect-ratio: 1; border-radius: 4px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.63rem; font-weight: 600;
-}
-.cal-d.empty  { }
-.cal-d.future { background: var(--s2); color: var(--t3); }
-.cal-d.today-mark { outline: 2px solid var(--blue-500); outline-offset: 1px; }
-.d0 { background: var(--s2); color: var(--t3); }
-.d1 { background: var(--green-050); color: var(--green-700); }
-.d2 { background: var(--green-100); color: var(--green-700); }
-.d3 { background: #7BCFAB; color: #fff; }
-.d4 { background: var(--green-500); color: #fff; }
-.d5 { background: var(--green-700); color: #fff; }
-
-/* ─── Settings ─── */
 .stg-toggle {
   display: flex; justify-content: space-between; align-items: center;
-  cursor: pointer; font-size: 0.88rem; font-weight: 700; user-select: none;
+  cursor: pointer; font-size: 0.8rem; font-weight: 700; user-select: none;
+  color: var(--blue-500);
 }
-.stg-toggle:hover { color: var(--blue-500); }
-.arrow { color: var(--t2); transition: transform 0.2s; display: inline-block; }
+.stg-toggle:hover { color: var(--blue-900); }
+.arrow { color: var(--blue-300); transition: transform 0.2s; display: inline-block; }
 .arrow.open { transform: rotate(90deg); }
-.stg-body { display: none; flex-direction: column; gap: 9px; margin-top: 14px; }
+.stg-body { display: none; flex-direction: column; gap: 7px; margin-top: 10px; }
 .stg-body.open { display: flex; }
-.irow { display: flex; align-items: center; gap: 10px; }
-.ilbl { font-size: 0.72rem; color: var(--t3); width: 14px; text-align: right; flex-shrink: 0; }
+.irow { display: flex; align-items: center; gap: 8px; }
+.ilbl { font-size: 0.68rem; color: var(--t3); width: 14px; text-align: right; flex-shrink: 0; }
 .hinput {
-  flex: 1; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 6px; color: var(--t1); padding: 8px 11px;
-  font-size: 0.87rem; font-family: Arial, sans-serif;
+  flex: 1; background: var(--s1); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--t1); padding: 6px 10px;
+  font-size: 0.82rem; font-family: Arial, sans-serif;
   outline: none; transition: border-color 0.15s;
 }
-.hinput:focus { border-color: var(--blue-500); }
+.hinput:focus { border-color: var(--blue-500); background: var(--blue-050); }
 .sbtn {
-  margin-top: 4px; width: 100%; background: var(--blue-500);
-  border: none; color: #fff; padding: 11px; border-radius: 8px;
-  font-size: 0.88rem; font-weight: 700; font-family: Arial, sans-serif;
+  width: 100%; background: var(--blue-500);
+  border: none; color: #fff; padding: 9px; border-radius: 7px;
+  font-size: 0.82rem; font-weight: 700; font-family: Arial, sans-serif;
   cursor: pointer; transition: background 0.15s;
 }
 .sbtn:hover { background: var(--blue-900); }
 
-/* ─── Footer ─── */
-.note { text-align: center; font-size: 0.68rem; color: var(--t3); }
+/* ── Side panel ── */
+.side-panel {
+  width: var(--side-w);
+  flex-shrink: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg);
+  border-left: 2px solid var(--blue-100);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: width 0.25s ease, padding 0.25s ease, border 0.25s ease;
+}
+.side-panel.closed {
+  width: 0; padding: 0; border-left: none; overflow: hidden;
+}
+
+.card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 12px;
+}
+.card-title {
+  font-size: 0.63rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--blue-500); margin-bottom: 10px;
+}
+
+/* Heatmap */
+.hmap { display: grid; grid-template-columns: repeat(15, 1fr); gap: 3px; }
+.cell { aspect-ratio: 1; border-radius: 3px; cursor: default; transition: transform 0.1s; }
+.cell:hover { transform: scale(1.4); z-index: 1; position: relative; }
+.h0 { background: var(--s2); }
+.h1 { background: var(--blue-050); }
+.h2 { background: var(--blue-100); }
+.h3 { background: var(--blue-300); }
+.h4 { background: var(--blue-500); }
+.h5 { background: var(--blue-900); }
+
+/* Calendar */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-wd { font-size: 0.58rem; color: var(--t3); text-align: center; padding-bottom: 3px; font-weight: 700; }
+.cal-d {
+  aspect-ratio: 1; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.58rem; font-weight: 600;
+}
+.cal-d.future { background: var(--s2); color: var(--t3); }
+.cal-d.today-mark { outline: 2px solid var(--blue-500); outline-offset: 1px; }
+.d0 { background: var(--s2); color: var(--t3); }
+.d1 { background: var(--blue-050); color: var(--blue-900); }
+.d2 { background: var(--blue-100); color: var(--blue-900); }
+.d3 { background: var(--blue-300); color: #fff; }
+.d4 { background: var(--blue-500); color: #fff; }
+.d5 { background: var(--blue-900); color: #fff; }
+
+/* Date list */
+.date-list { display: flex; flex-direction: column; gap: 2px; }
+.date-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 6px; border-radius: 5px; font-size: 0.68rem;
+}
+.date-row:hover { background: var(--blue-050); }
+.date-row.is-today { background: var(--blue-050); border: 1px solid var(--blue-100); border-radius: 5px; }
+.dr-date { color: var(--t2); width: 64px; flex-shrink: 0; font-size: 0.65rem; }
+.dr-dots { flex: 1; letter-spacing: 0.5px; font-size: 0.72rem; }
+.dr-pct { width: 32px; text-align: right; font-weight: 700; font-size: 0.65rem; flex-shrink: 0; }
+.pct-100 { color: var(--blue-900); }
+.pct-hi  { color: var(--blue-500); }
+.pct-mid { color: var(--blue-300); }
+.pct-lo  { color: var(--t3); }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="top-bar">
-    <div class="header">
-      <h1>習慣トラッカー</h1>
-      <p>毎日の記録を積み上げよう</p>
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="header">
+    <h1>習慣トラッカー</h1>
+    <p>毎日の記録を積み上げよう</p>
+  </div>
+
+  <div class="stat-chips">
+    <div class="chip">
+      <span class="chip-num orange" id="s-streak">0</span>
+      <span class="chip-lbl">連続日数</span>
     </div>
-    <div class="month-nav">
-      <button class="nav-btn" id="prev">‹</button>
-      <span class="month-label" id="month-lbl"></span>
-      <button class="nav-btn" id="next">›</button>
+    <div class="chip">
+      <span class="chip-num blue" id="s-best">0</span>
+      <span class="chip-lbl">最長記録</span>
+    </div>
+    <div class="chip">
+      <span class="chip-num green" id="s-rate">—</span>
+      <span class="chip-lbl">今月達成率</span>
     </div>
   </div>
 
-  <div class="stats">
-    <div class="stat">
-      <span class="stat-num orange" id="s-streak">0</span>
-      <div class="stat-lbl">連続日数</div>
-    </div>
-    <div class="stat">
-      <span class="stat-num blue" id="s-best">0</span>
-      <div class="stat-lbl">最長記録</div>
-    </div>
-    <div class="stat">
-      <span class="stat-num green" id="s-rate">—</span>
-      <div class="stat-lbl">今月達成率</div>
-    </div>
+  <div class="month-nav">
+    <button class="nav-btn" id="prev">‹</button>
+    <span class="month-label" id="month-lbl"></span>
+    <button class="nav-btn" id="next">›</button>
   </div>
 
-  <div class="main-grid">
+  <button class="toggle-side" id="toggle-side" title="履歴パネルを開閉">▶</button>
+</div>
+
+<!-- Body -->
+<div class="body-area">
+
+  <!-- Main -->
+  <div class="main-panel">
     <div class="today">
       <div class="today-head">
         <span class="today-date" id="today-lbl"></span>
@@ -251,31 +334,33 @@ body {
       <div class="ebar" id="ebar"></div>
     </div>
 
-    <div class="side-panel">
-      <div class="heatmap-card">
-        <div class="card-title">直近 15 週</div>
-        <div class="hmap" id="hmap"></div>
+    <div class="settings-card">
+      <div class="stg-toggle" id="stg-toggle">
+        <span>習慣を編集する</span>
+        <span class="arrow" id="stg-arrow">›</span>
       </div>
-
-      <div class="cal-card">
-        <div class="card-title" id="cal-title">月間カレンダー</div>
-        <div class="cal-grid" id="cal-grid"></div>
+      <div class="stg-body" id="stg-body">
+        <div id="stg-inputs"></div>
+        <button class="sbtn" id="stg-save">保存する</button>
       </div>
     </div>
   </div>
 
-  <div class="settings-card">
-    <div class="stg-toggle" id="stg-toggle">
-      <span>習慣を編集する</span>
-      <span class="arrow" id="stg-arrow">›</span>
+  <!-- Side -->
+  <div class="side-panel" id="side-panel">
+    <div class="card">
+      <div class="card-title">直近 15 週</div>
+      <div class="hmap" id="hmap"></div>
     </div>
-    <div class="stg-body" id="stg-body">
-      <div id="stg-inputs"></div>
-      <button class="sbtn" id="stg-save">保存する</button>
+    <div class="card">
+      <div class="card-title" id="cal-title">月間カレンダー</div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">日付ごとの記録</div>
+      <div class="date-list" id="date-list"></div>
     </div>
   </div>
-
-  <div class="note">データはブラウザ（localStorage）に保存されます</div>
 </div>
 
 <script>
@@ -334,7 +419,7 @@ function renderToday() {
     list.appendChild(el);
   });
 
-  const emojis=r.map(v=>v?'🟩':'⬜').join('');
+  const emojis=r.map(v=>v?'🟦':'⬜').join('');
   const label=pct===100?'完璧':pct>=80?'良い':pct>=60?'まずまず':pct>=40?'もう少し':'頑張ろう';
   document.getElementById('ebar').innerHTML=`<span>${emojis}</span><span class="eval">${label}</span>`;
 }
@@ -379,6 +464,23 @@ function renderCal() {
   }
 }
 
+function renderDateList() {
+  const list=document.getElementById('date-list'); list.innerHTML='';
+  const now=new Date(), todayKey=dk(now);
+  for(let i=0;i<90;i++){
+    const d=new Date(now); d.setDate(d.getDate()-i);
+    const k=dk(d), pct=rate(k);
+    const r=rec(k);
+    const dots=r.map(v=>v?'🟦':'⬜').join('');
+    const dateStr=`${d.getMonth()+1}/${d.getDate()} ${WD[d.getDay()]}`;
+    const pctCls=pct===100?'pct-100':pct>=80?'pct-hi':pct>=40?'pct-mid':'pct-lo';
+    const row=document.createElement('div');
+    row.className='date-row'+(k===todayKey?' is-today':'');
+    row.innerHTML=`<span class="dr-date">${dateStr}</span><span class="dr-dots">${dots}</span><span class="dr-pct ${pctCls}">${pct}%</span>`;
+    list.appendChild(row);
+  }
+}
+
 function renderSettings() {
   const box=document.getElementById('stg-inputs'); box.innerHTML='';
   st.habits.forEach((name,i)=>{
@@ -387,6 +489,16 @@ function renderSettings() {
     box.appendChild(row);
   });
 }
+
+// Side panel toggle
+const sidePanel=document.getElementById('side-panel');
+const toggleBtn=document.getElementById('toggle-side');
+let sideOpen=true;
+toggleBtn.onclick=()=>{
+  sideOpen=!sideOpen;
+  sidePanel.classList.toggle('closed',!sideOpen);
+  toggleBtn.textContent=sideOpen?'▶':'◀';
+};
 
 document.getElementById('stg-toggle').onclick=()=>{
   const b=document.getElementById('stg-body'), a=document.getElementById('stg-arrow');
@@ -402,7 +514,7 @@ document.getElementById('stg-save').onclick=()=>{
 document.getElementById('prev').onclick=()=>{ if(vm.m===0){vm.y--;vm.m=11;}else vm.m--; renderNav();renderStats();renderCal(); };
 document.getElementById('next').onclick=()=>{ if(vm.m===11){vm.y++;vm.m=0;}else vm.m++; renderNav();renderStats();renderCal(); };
 
-function renderAll() { renderToday();renderStats();renderNav();renderHmap();renderCal();renderSettings(); }
+function renderAll() { renderToday();renderStats();renderNav();renderHmap();renderCal();renderDateList();renderSettings(); }
 renderAll();
 </script>
 </body>
