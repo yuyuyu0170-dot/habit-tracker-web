@@ -456,22 +456,46 @@ function renderSettings() {
 }
 
 // Zoom
-const ZOOM_KEY='habit-zoom';
 const ZOOM_STEP=5, ZOOM_MIN=50, ZOOM_MAX=150;
-let zoomPct=parseInt(localStorage.getItem(ZOOM_KEY))||100;
+// コンテンツが快適に表示される基準サイズ（デザイン時のサイズ）
+const REF_W=900, REF_H=450;
+let zoomPct=100;
+let manualOverride=false;
+
 function applyZoom(){
   const z=zoomPct/100;
   document.documentElement.style.zoom=z;
-  // vw/vh はズームの影響を受けず常に実際のビューポートを参照するため、
-  // body を (100/z)vw × (100/z)vh にすると z 倍されてちょうど viewport を埋める（余白なし）。
   document.body.style.width=`${100/z}vw`;
   document.body.style.height=`${100/z}vh`;
   document.getElementById('zoom-lbl').textContent=zoomPct+'%';
-  localStorage.setItem(ZOOM_KEY,zoomPct);
 }
-document.getElementById('zoom-in').onclick=()=>{ zoomPct=Math.min(ZOOM_MAX,zoomPct+ZOOM_STEP); applyZoom(); };
-document.getElementById('zoom-out').onclick=()=>{ zoomPct=Math.max(ZOOM_MIN,zoomPct-ZOOM_STEP); applyZoom(); };
-applyZoom();
+
+// viewport に合わせて自動フィット（余白ゼロになるよう縮小）
+function autoFit(){
+  const scale=Math.min(window.innerWidth/REF_W, window.innerHeight/REF_H, 1.5);
+  zoomPct=Math.round(Math.max(ZOOM_MIN,Math.min(ZOOM_MAX,scale*100))/5)*5;
+  applyZoom();
+}
+
+// 手動ボタン
+document.getElementById('zoom-in').onclick=()=>{
+  manualOverride=true;
+  zoomPct=Math.min(ZOOM_MAX,zoomPct+ZOOM_STEP); applyZoom();
+};
+document.getElementById('zoom-out').onclick=()=>{
+  manualOverride=true;
+  zoomPct=Math.max(ZOOM_MIN,zoomPct-ZOOM_STEP); applyZoom();
+};
+
+// Notionがembedをリサイズしたときに自動再計算（手動調整後はスキップ）
+let _rzTimer;
+window.addEventListener('resize',()=>{
+  if(manualOverride) return;
+  clearTimeout(_rzTimer);
+  _rzTimer=setTimeout(autoFit,150);
+});
+
+autoFit(); // 初期表示時に自動フィット
 
 // Side panel
 const sidePanel=document.getElementById('side-panel');
