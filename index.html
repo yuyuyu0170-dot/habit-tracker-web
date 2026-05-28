@@ -249,12 +249,15 @@ html, body {
 .d5 { background: var(--blue-900); color: #fff; }
 
 .date-list { display: flex; flex-direction: column; gap: 2px; }
+.date-item {} /* 行 + 編集パネルのラッパー */
 .date-row {
   display: flex; align-items: center; gap: 6px;
   padding: 4px 6px; border-radius: 5px; font-size: 0.68rem;
+  cursor: pointer; user-select: none; transition: background 0.12s;
 }
 .date-row:hover { background: var(--blue-050); }
 .date-row.is-today { background: var(--blue-050); border: 1px solid var(--blue-100); }
+.date-row.editing { background: var(--blue-100); }
 .dr-date { color: var(--t2); width: 64px; flex-shrink: 0; font-size: 0.65rem; }
 .dr-dots { flex: 1; letter-spacing: 0.5px; font-size: 0.72rem; }
 .dr-pct { width: 32px; text-align: right; font-weight: 700; font-size: 0.65rem; flex-shrink: 0; }
@@ -262,6 +265,40 @@ html, body {
 .pct-hi  { color: var(--blue-500); }
 .pct-mid { color: var(--blue-300); }
 .pct-lo  { color: var(--t3); }
+
+/* 過去日のインライン編集パネル */
+.date-edit {
+  display: none;
+  flex-direction: column; gap: 4px;
+  margin: 2px 0 6px 0; padding: 8px;
+  background: var(--bg); border: 1px solid var(--blue-100);
+  border-radius: 7px;
+}
+.date-edit.open { display: flex; }
+.de-habit {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 7px; border-radius: 5px; font-size: 0.7rem;
+  background: var(--s1); border: 1px solid var(--border);
+  cursor: pointer; user-select: none; transition: background 0.12s, border-color 0.12s;
+}
+.de-habit:hover { background: var(--blue-050); border-color: var(--blue-100); }
+.de-habit.done { background: var(--green-050); border-color: var(--green-100); }
+.de-chk {
+  width: 15px; height: 15px; border-radius: 4px; flex-shrink: 0;
+  border: 1.5px solid var(--blue-200, #9BBCFD);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; color: #fff;
+}
+.de-habit.done .de-chk { background: var(--green-500); border-color: var(--green-500); }
+.de-name { font-size: 0.7rem; }
+.de-habit.done .de-name { color: var(--green-700); }
+.de-foot { display: flex; justify-content: flex-end; padding-top: 2px; }
+.de-close {
+  font-size: 0.6rem; color: var(--blue-500); cursor: pointer;
+  background: var(--blue-050); border: 1px solid var(--blue-100);
+  border-radius: 12px; padding: 2px 10px;
+}
+.de-close:hover { background: var(--blue-100); }
 </style>
 </head>
 <body>
@@ -370,10 +407,14 @@ function rate(k) { const r=rec(k), n=st.habits.length; return n ? Math.round(r.f
 function heatCls(r, pre='h') { return r===0?`${pre}0`:r<=20?`${pre}1`:r<=40?`${pre}2`:r<=60?`${pre}3`:r<=80?`${pre}4`:`${pre}5`; }
 
 function calcStreak() {
+  // 今日が未達でも「昨日までの連続記録」は維持する。
+  // 起点を決める: 今日が100%なら今日から、そうでなければ昨日から数え始める。
+  // こうしないと「今日まだ途中」というだけで昨日までのストリークが途切れて見えてしまう。
   let s=0; const now=new Date();
-  for(let i=0;i<400;i++){
+  const start = rate(dk(now))===100 ? 0 : 1;
+  for(let i=start;i<400;i++){
     const d=new Date(now); d.setDate(d.getDate()-i);
-    if(rate(dk(d))===100) s++; else if(i>0) break;
+    if(rate(dk(d))===100) s++; else break;
   }
   st.streakBest=Math.max(st.streakBest||0,s); return s;
 }
@@ -449,6 +490,9 @@ function renderCal() {
   }
 }
 
+// 現在インライン編集中の日付キー（再描画をまたいで開閉状態を維持する）。null=閉じている
+let editingKey=null;
+
 function renderDateList() {
   const list=document.getElementById('date-list'); list.innerHTML='';
   const now=new Date(), todayKey=dk(now);
@@ -459,11 +503,57 @@ function renderDateList() {
     const dots=r.map(v=>v?'🟦':'⬜').join('');
     const dateStr=`${d.getMonth()+1}/${d.getDate()} ${WD[d.getDay()]}`;
     const pctCls=pct===100?'pct-100':pct>=80?'pct-hi':pct>=40?'pct-mid':'pct-lo';
+
+    const item=document.createElement('div'); item.className='date-item';
+    const open=(editingKey===k);
+
     const row=document.createElement('div');
-    row.className='date-row'+(k===todayKey?' is-today':'');
+    row.className='date-row'+(k===todayKey?' is-today':'')+(open?' editing':'');
     row.innerHTML=`<span class="dr-date">${dateStr}</span><span class="dr-dots">${dots}</span><span class="dr-pct ${pctCls}">${pct}%</span>`;
-    list.appendChild(row);
+    row.onclick=()=>{ editingKey=(editingKey===k)?null:k; renderDateList(); };
+    item.appendChild(row);
+
+    // 編集パネル（開いている日付のみ中身を生成）
+    const edit=document.createElement('div'); edit.className='date-edit'+(open?' open':'');
+    if(open) buildDateEditPanel(edit, k);
+    item.appendChild(edit);
+
+    list.appendChild(item);
   }
+}
+
+// 指定日(k)のチェック編集パネルを組み立てる。未来日は編集不可。
+function buildDateEditPanel(container, k){
+  container.innerHTML='';
+  const todayKey=dk(new Date());
+  const isFuture=k>todayKey; // 'YYYY-MM-DD' は文字列比較で日付順になる
+  if(isFuture){
+    const msg=document.createElement('div');
+    msg.style.cssText='font-size:0.65rem;color:var(--t3);padding:4px;';
+    msg.textContent='未来の日付は編集できません';
+    container.appendChild(msg);
+    return;
+  }
+  st.habits.forEach((name,i)=>{
+    const r=rec(k);
+    const h=document.createElement('div');
+    h.className='de-habit'+(r[i]?' done':'');
+    const chk=document.createElement('div'); chk.className='de-chk'; chk.textContent=r[i]?'✓':'';
+    const nm=document.createElement('div'); nm.className='de-name'; nm.textContent=name;
+    h.appendChild(chk); h.appendChild(nm);
+    h.onclick=(ev)=>{
+      ev.stopPropagation();
+      const rr=rec(k).slice(); rr[i]=!rr[i]; st.records[k]=rr; save();
+      // 編集中の日付を開いたまま全体を再描画して整合を取る
+      renderAll();
+    };
+    container.appendChild(h);
+  });
+  const foot=document.createElement('div'); foot.className='de-foot';
+  const close=document.createElement('div'); close.className='de-close'; close.textContent='閉じる';
+  close.onclick=(ev)=>{ ev.stopPropagation(); editingKey=null; renderDateList(); };
+  foot.appendChild(close);
+  container.appendChild(foot);
 }
 
 function renderSettings() {
