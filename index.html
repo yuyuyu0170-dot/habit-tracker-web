@@ -191,6 +191,23 @@ html, body {
 .stg-body.open { display: flex; }
 .irow { display: flex; align-items: center; gap: 8px; }
 .ilbl { font-size: 0.68rem; color: var(--t3); width: 14px; text-align: right; flex-shrink: 0; }
+.weekly-setting {
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 8px; margin-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+}
+.weekly-label {
+  font-size: 0.72rem; font-weight: 700; color: var(--blue-500);
+  flex-shrink: 0;
+}
+.weekly-input {
+  width: 56px; background: var(--s1); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--t1); padding: 6px 8px;
+  font-size: 0.82rem; font-family: Arial, sans-serif;
+  outline: none; text-align: center;
+}
+.weekly-input:focus { border-color: var(--blue-500); background: var(--blue-050); }
+.weekly-unit { font-size: 0.68rem; color: var(--t2); }
 .hinput {
   flex: 1; background: var(--s1); border: 1px solid var(--border);
   border-radius: 6px; color: var(--t1); padding: 6px 10px;
@@ -315,15 +332,15 @@ html, body {
   <div class="stat-chips">
     <div class="chip">
       <span class="chip-num orange" id="s-streak">0</span>
-      <span class="chip-lbl">連続日数</span>
+      <span class="chip-lbl">連続週数</span>
     </div>
     <div class="chip">
       <span class="chip-num blue" id="s-best">0</span>
-      <span class="chip-lbl">最長記録</span>
+      <span class="chip-lbl">最長週数</span>
     </div>
     <div class="chip" id="chip-rate">
       <span class="chip-num green" id="s-rate">—</span>
-      <span class="chip-lbl">今月達成率</span>
+      <span class="chip-lbl">今週達成</span>
     </div>
   </div>
 
@@ -354,6 +371,11 @@ html, body {
         <span class="arrow" id="stg-arrow">›</span>
       </div>
       <div class="stg-body" id="stg-body">
+        <div class="weekly-setting">
+          <span class="weekly-label">週の目標日数</span>
+          <input class="weekly-input" id="weekly-target" type="number" min="1" max="7" step="1" inputmode="numeric">
+          <span class="weekly-unit">日</span>
+        </div>
         <div id="stg-inputs"></div>
         <button class="sbtn" id="stg-save">保存する</button>
       </div>
@@ -388,14 +410,24 @@ html, body {
 <script>
 const KEY = 'habit-v2';
 const WD  = ['日','月','火','水','木','金','土'];
+const clamp = (n,min,max) => Math.max(min, Math.min(max, n));
 const pad = n => String(n).padStart(2,'0');
 const dk  = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 
 function load() {
-  try { return JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch { return fresh(); }
+  try { return normalize(JSON.parse(localStorage.getItem(KEY)) || {}); } catch { return fresh(); }
 }
 function fresh() {
-  return { habits:['習慣 1','習慣 2','習慣 3','習慣 4','習慣 5'], records:{}, streakBest:0 };
+  return { habits:['習慣 1','習慣 2','習慣 3','習慣 4','習慣 5'], records:{}, streakBest:0, weekStreakBest:0, weeklyTarget:5 };
+}
+function normalize(raw) {
+  const base = fresh();
+  const next = (raw && typeof raw === 'object') ? { ...base, ...raw } : base;
+  if(!Array.isArray(next.habits) || next.habits.length===0) next.habits = base.habits;
+  if(!next.records || typeof next.records !== 'object' || Array.isArray(next.records)) next.records = {};
+  next.weeklyTarget = clamp(parseInt(next.weeklyTarget,10) || base.weeklyTarget, 1, 7);
+  next.weekStreakBest = Math.max(0, parseInt(next.weekStreakBest,10) || 0);
+  return next;
 }
 function save() { localStorage.setItem(KEY, JSON.stringify(st)); }
 
@@ -406,17 +438,68 @@ function rec(k) { const r = st.records[k]; return Array.isArray(r) ? r : st.habi
 function rate(k) { const r=rec(k), n=st.habits.length; return n ? Math.round(r.filter(Boolean).length/n*100) : 0; }
 function heatCls(r, pre='h') { return r===0?`${pre}0`:r<=20?`${pre}1`:r<=40?`${pre}2`:r<=60?`${pre}3`:r<=80?`${pre}4`:`${pre}5`; }
 
-function calcStreak() {
-  // 今日が未達でも「昨日までの連続記録」は維持する。
-  // 起点を決める: 今日が100%なら今日から、そうでなければ昨日から数え始める。
-  // こうしないと「今日まだ途中」というだけで昨日までのストリークが途切れて見えてしまう。
-  let s=0; const now=new Date();
-  const start = rate(dk(now))===100 ? 0 : 1;
-  for(let i=start;i<400;i++){
-    const d=new Date(now); d.setDate(d.getDate()-i);
-    if(rate(dk(d))===100) s++; else break;
+function weeklyTarget() {
+  st.weeklyTarget = clamp(parseInt(st.weeklyTarget,10) || 5, 1, 7);
+  return st.weeklyTarget;
+}
+function dateOnly(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function addDays(d, days) { const x=dateOnly(d); x.setDate(x.getDate()+days); return x; }
+function startOfWeek(d) {
+  const x=dateOnly(d);
+  x.setDate(x.getDate()-x.getDay());
+  return x;
+}
+function isStreakDay(k) {
+  return rec(k).some(Boolean);
+}
+function weekStats(startDate) {
+  const start=startOfWeek(startDate);
+  const todayKey=dk(new Date());
+  let completed=0;
+  for(let i=0;i<7;i++){
+    const day=addDays(start,i);
+    const key=dk(day);
+    if(key<=todayKey && isStreakDay(key)) completed++;
   }
-  st.streakBest=Math.max(st.streakBest||0,s); return s;
+  const target=weeklyTarget();
+  return { start, completed, target, met: completed>=target };
+}
+function hasMetWeekBefore(startDate, limit=104) {
+  let cursor=addDays(startOfWeek(startDate),-7);
+  for(let i=0;i<limit;i++){
+    if(weekStats(cursor).met) return true;
+    cursor=addDays(cursor,-7);
+  }
+  return false;
+}
+function calcStreakInfo() {
+  const now=new Date();
+  let cursor=startOfWeek(now);
+  const current=weekStats(cursor);
+  const pendingCurrent=!current.met;
+  if(pendingCurrent) cursor=addDays(cursor,-7);
+
+  let streak=0;
+  let freezes=1;
+  let freezeUsed=false;
+  for(let i=0;i<104;i++){
+    const wk=weekStats(cursor);
+    if(wk.met){
+      streak++;
+    }else if(freezes>0 && hasMetWeekBefore(cursor,104-i)){
+      freezes--;
+      freezeUsed=true;
+    }else{
+      break;
+    }
+    cursor=addDays(cursor,-7);
+  }
+
+  if((st.weekStreakBest||0)<streak){
+    st.weekStreakBest=streak;
+    save();
+  }
+  return { count: streak, current, pendingCurrent, freezeUsed };
 }
 function monthRate(y,m) {
   const now=new Date(), isThis=(y===now.getFullYear()&&m===now.getMonth());
@@ -447,14 +530,16 @@ function renderToday() {
 
   const emojis=r.map(v=>v?'🟦':'⬜').join('');
   const label=pct===100?'完璧':pct>=80?'良い':pct>=60?'まずまず':pct>=40?'もう少し':'頑張ろう';
-  document.getElementById('ebar').innerHTML=`<span>${emojis}</span><span class="eval">${label}</span>`;
+  const wk=weekStats(now);
+  const weekLabel=wk.met?'今週達成':`今週 ${wk.completed}/${wk.target}`;
+  document.getElementById('ebar').innerHTML=`<span>${emojis}</span><span class="eval">${label}</span><span class="eval">${weekLabel}</span>`;
 }
 
 function renderStats() {
-  const streak=calcStreak();
-  document.getElementById('s-streak').textContent=streak;
-  document.getElementById('s-best').textContent=st.streakBest;
-  document.getElementById('s-rate').textContent=monthRate(vm.y,vm.m)+'%';
+  const streak=calcStreakInfo();
+  document.getElementById('s-streak').textContent=streak.count;
+  document.getElementById('s-best').textContent=st.weekStreakBest||0;
+  document.getElementById('s-rate').textContent=`${streak.current.completed}/${streak.current.target}`;
 }
 
 function renderNav() {
@@ -557,6 +642,8 @@ function buildDateEditPanel(container, k){
 }
 
 function renderSettings() {
+  const weekly=document.getElementById('weekly-target');
+  if(weekly) weekly.value=weeklyTarget();
   const box=document.getElementById('stg-inputs'); box.innerHTML='';
   st.habits.forEach((name,i)=>{
     const row=document.createElement('div'); row.className='irow';
@@ -643,6 +730,8 @@ document.getElementById('stg-toggle').onclick=()=>{
   const open=b.classList.toggle('open'); a.classList.toggle('open',open);
 };
 document.getElementById('stg-save').onclick=()=>{
+  const weekly=document.getElementById('weekly-target');
+  st.weeklyTarget=clamp(parseInt(weekly.value,10)||5,1,7);
   st.habits=[...document.querySelectorAll('#stg-inputs .hinput')].map((inp,i)=>inp.value.trim()||`習慣 ${i+1}`);
   save(); renderAll();
   document.getElementById('stg-body').classList.remove('open');
